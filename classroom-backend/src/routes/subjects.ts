@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns, ilike, or, sql, desc } from 'drizzle-orm';
+import { and, eq, getTableColumns, ilike, or, sql, desc, count } from 'drizzle-orm';
 import express, { json } from 'express';
 import { departments, subjects } from '../db/schema';
 import { db } from '../db';
@@ -40,7 +40,7 @@ router.get('/',async(req,res)=>{
 
         const whereClause=filterConditions.length > 0 ? and(...filterConditions):undefined;
 
-        const countResult=await db.select({count:sql<number>`count(*)`})
+        const countResult=await db.select({count:count()})
             .from(subjects)
             .leftJoin(departments,eq(subjects.departmentId,departments.id))
             .where(whereClause);
