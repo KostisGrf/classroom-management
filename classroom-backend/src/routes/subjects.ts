@@ -9,11 +9,11 @@ const router=express.Router();
 //Get all subjects with optional search, pagination and filtering
 router.get('/',async(req,res)=>{
     try {
-        const {search,deparment,page=1,limit=10}=req.query;
+        const {search,department,page=1,limit=10}=req.query;
 
-        const currentPage=Math.max(1,+page);
-        const limitPerPage=Math.max(1,+limit);
-        
+        const currentPage=Math.max(1,parseInt(String(page),10) || 1);
+        const limitPerPage=Math.min(Math.max(1,parseInt(String(limit),10) || 10),100);
+
         const offset=(currentPage-1)*limitPerPage;
 
         const filterConditions=[];
@@ -25,8 +25,17 @@ router.get('/',async(req,res)=>{
             ))
         }
 
-        if(deparment){
-            filterConditions.push(ilike(departments.name,`%${deparment}%`));
+            function escapeLike(str:String):string {
+                    return str.replace(/[%_]/g, '\\$&');
+                    }
+            const safeDepartment = escapeLike(String(department).trim());
+
+        if(department){
+            
+
+    filterConditions.push(
+        ilike(departments.name, `%${safeDepartment}%`)
+    );
         }
 
         const whereClause=filterConditions.length > 0 ? and(...filterConditions):undefined;
