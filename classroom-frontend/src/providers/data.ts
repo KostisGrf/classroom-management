@@ -12,6 +12,10 @@ const options:CreateDataProviderOptions = {
         const page=pagination?.currentPage ?? 1;
         const pageSize=pagination?.pageSize ?? 10;
 
+        if (resource === "departments") {
+              return {};
+                }
+
         const params:Record<string,string|number>={page,limit:pageSize};
 
         filters?.forEach(filter=>{
@@ -21,21 +25,24 @@ const options:CreateDataProviderOptions = {
             const value= String(filter.value);
 
             if(resource==='subjects'){
-              if(field==='department') params.department=value;
+              if (field === "departmentId") params.departmentId = value;
               if (field==='name' || field==='code') params.search=value;
 
             }
+
+            
+
+          
+
         });
 
         return params;
       },
 
-      mapResponse:async (response)=>{
-        const  payload: ListResponse = await response.clone().json();
-
-        return payload.data ?? [];
-
-      },
+      mapResponse: async (response) => {
+  const payload: ListResponse = await response.clone().json();
+  return payload.data ?? [];
+  },
 
       getTotalCount: async (response) => {
         const payload: ListResponse = await response.clone().json();
