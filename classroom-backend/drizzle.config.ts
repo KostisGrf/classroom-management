@@ -11,8 +11,5 @@ export default defineConfig({
   dialect: 'postgresql',
   dbCredentials: {
     url: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false, // Αυτό θα παρακάμψει το σφάλμα του certificate
-    },
   },
 });
