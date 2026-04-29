@@ -1,7 +1,28 @@
 import {createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 import { ListResponse } from "@/Types";
 import { BACKEND_BASE_URL } from "@/constants";
+import { HttpError } from "@refinedev/core";
 
+
+const buildHttpError= async (response:Response):Promise<HttpError> => {
+    let message = 'Request failed';
+
+    try {
+      const payload = (await response.json()) as {message?: string;};
+
+      if (payload?.message) {
+        message = payload.message;
+      }
+    } catch {
+      //ignore errors
+    }
+
+    return {
+      message,
+      statusCode: response.status,
+      
+    }
+}
 
 
 const options:CreateDataProviderOptions = {
@@ -40,11 +61,17 @@ const options:CreateDataProviderOptions = {
       },
 
       mapResponse: async (response) => {
+        if(!response.ok) {
+          throw await buildHttpError(response);
+        }
   const payload: ListResponse = await response.clone().json();
   return payload.data ?? [];
   },
 
       getTotalCount: async (response) => {
+        if(!response.ok) {
+          throw await buildHttpError(response);
+        }
         const payload: ListResponse = await response.clone().json();
         return payload.pagination?.total ?? payload.data?.length ?? 0;
       }
