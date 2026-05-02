@@ -1,6 +1,6 @@
 import express from 'express';
-import {db} from '../db';
-import { departments, subjects } from '../db/schema';;
+import {db} from '../db/index.js';
+import { departments, subjects } from '../db/schema/index.js';
 import {and, count, eq, getTableColumns, ilike, or} from 'drizzle-orm';
 
 

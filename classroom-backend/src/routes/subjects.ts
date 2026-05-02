@@ -1,7 +1,7 @@
 import { and, eq, getTableColumns, ilike, or, sql, desc, count } from 'drizzle-orm';
 import express, { json } from 'express';
-import { departments, subjects } from '../db/schema';
-import { db } from '../db';
+import { departments, subjects } from '../db/schema/index.js';
+import { db } from '../db/index.js';
 import { get } from 'node:http';
 
 const router=express.Router();
