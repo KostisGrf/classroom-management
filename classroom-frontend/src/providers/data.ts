@@ -1,5 +1,5 @@
 import {createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
-import { ListResponse } from "@/Types";
+import { CreateResponse, ListResponse } from "@/Types";
 import { BACKEND_BASE_URL } from "@/constants";
 import { HttpError } from "@refinedev/core";
 
@@ -27,6 +27,7 @@ const buildHttpError= async (response:Response):Promise<HttpError> => {
 
 const options:CreateDataProviderOptions = {
     getList: {
+    
       getEndpoint:({resource}) => resource,
 
       buildQueryParams : async ({resource,pagination,filters})=>{
@@ -74,6 +75,18 @@ const options:CreateDataProviderOptions = {
         }
         const payload: ListResponse = await response.clone().json();
         return payload.pagination?.total ?? payload.data?.length ?? 0;
+      }
+    },
+    create:{
+      getEndpoint:({resource}) => resource,
+      
+
+      buildBodyParams:async ({variables}) => variables,
+
+      mapResponse: async (response)=>{
+        const json:CreateResponse = await response.clone().json();
+
+        return json.data ?? [];
       }
     }
 };

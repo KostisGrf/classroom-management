@@ -1,7 +1,7 @@
 import {CreateView} from "@/components/refine-ui/views/create-view.tsx";
 import {Breadcrumb} from "@/components/refine-ui/layout/breadcrumb.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {useBack} from "@refinedev/core";
+import {useBack, useList} from "@refinedev/core";
 import {Separator} from "@/components/ui/separator.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -22,6 +22,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Loader2} from "lucide-react";
 import UploadWidget from "@/components/upload-widget";
+import { Subject, User } from "@/Types";
 
 
 
@@ -38,6 +39,7 @@ const Create = () => {
     });
 
     const {
+        refineCore:{onFinish},
         handleSubmit,
         formState: { isSubmitting,errors },
         control,
@@ -45,35 +47,31 @@ const Create = () => {
 
     const onSubmit = async (values: z.infer<typeof classSchema>) => {
         try {
-            console.log(values);
+            await onFinish(values);
         } catch (error) {
             console.error("Error creating class:", error);
         }
     };
 
-    const teachers = [
-        {
-            id: 1,
-            name: "John Doe",
-        },
-        {
-            id: 2,
-            name: "Jane Doe",
-        },
-    ];
+    const {query:subjectsQuery}=useList<Subject>({
+        resource:"subjects",
+        pagination:{pageSize:100},
+    });
 
-    const subjects = [
-        {
-            id: 1,
-            name: "Math",
-            code: "MATH",
-        },
-        {
-            id: 2,
-            name: "English",
-            code: "ENG",
-        },
-    ];
+    const {query:teachersQuery}=useList<User>({
+        resource:"users",
+        filters:[{
+            field:"role",operator:"eq",
+            value:"teacher"
+        }],
+        pagination:{pageSize:100},
+    })
+
+    const subjects=subjectsQuery.data?.data || [];
+    const subjectsLoading=subjectsQuery.isLoading;
+    
+    const teachers=teachersQuery.data?.data || [];
+    const teachersLoading=teachersQuery.isLoading;
 
 
 
@@ -175,6 +173,7 @@ const Create = () => {
                                                         field.onChange(Number(value))
                                                     }
                                                     value={field.value?.toString()}
+                                                    disabled={subjectsLoading || subjects.length === 0}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
@@ -208,6 +207,7 @@ const Create = () => {
                                                 <Select
                                                     onValueChange={field.onChange}
                                                     value={field.value}
+                                                    disabled={teachersLoading || teachers.length === 0}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
