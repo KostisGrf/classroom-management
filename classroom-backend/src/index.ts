@@ -1,15 +1,16 @@
 
 import AgentAPI from "apminsight";
-AgentAPI.config()
+AgentAPI.config();
 
 import express from "express";
 import subjectsRouter from "./routes/subjects.js";
+import usersRouter from "./routes/users.js";
 import cors from 'cors';
 import departmentsRouter from "./routes/departments.js";
 import securityMiddleware from "./middleware/security.js";
 import { auth } from "./lib/auth.js";
 import { toNodeHandler } from "better-auth/node";
-import { Agent } from "node:http";
+import classesRouter from "./routes/classes.js";
 
 const app = express();
 const PORT = 8000;
@@ -29,6 +30,8 @@ app.use(express.json());
 app.use(securityMiddleware)
 
 app.use('/api/subjects',subjectsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/classes',classesRouter);
 app.use('/api/departments',departmentsRouter);
 
 // root route
