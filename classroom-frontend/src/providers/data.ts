@@ -1,7 +1,8 @@
 import {createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
-import { CreateResponse, ListResponse } from "@/Types";
+import { CreateResponse, GetOneResponse, ListResponse } from "@/Types";
 import { BACKEND_BASE_URL } from "@/constants";
 import { HttpError } from "@refinedev/core";
+
 
 
 const buildHttpError= async (response:Response):Promise<HttpError> => {
@@ -42,14 +43,17 @@ const options:CreateDataProviderOptions = {
 
         filters?.forEach(filter=>{
             const field= 'field' in filter ? filter.field : undefined;
-            
-
             const value= String(filter.value);
 
             if(resource==='subjects'){
               if (field === "departmentId") params.departmentId = value;
               if (field==='name' || field==='code') params.search=value;
+            }
 
+            if (resource === 'classes') {
+              if (field === 'name') params.search = value;
+              if (field === 'subject') params.subject = value;
+              if (field === 'teacher') params.teacher = value;
             }
 
             
@@ -85,6 +89,15 @@ const options:CreateDataProviderOptions = {
 
       mapResponse: async (response)=>{
         const json:CreateResponse = await response.clone().json();
+
+        return json.data ?? [];
+      }
+    },
+    getOne:{
+      getEndpoint: ({resource,id})=>`${resource}/${id}`,
+
+      mapResponse:async (response) =>{
+        const json:GetOneResponse=await response.json();
 
         return json.data ?? [];
       }
