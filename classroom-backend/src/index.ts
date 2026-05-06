@@ -11,6 +11,8 @@ import securityMiddleware from "./middleware/security.js";
 import { auth } from "./lib/auth.js";
 import { toNodeHandler } from "better-auth/node";
 import classesRouter from "./routes/classes.js";
+import statsRouter from "./routes/stats.js";
+import enrollmentsRouter from "./routes/enrollments.js";
 
 const app = express();
 const PORT = 8000;
@@ -27,12 +29,14 @@ app.all('/api/auth/*splat', toNodeHandler(auth));
 // middleware
 app.use(express.json());
 
-app.use(securityMiddleware)
+// app.use(securityMiddleware)
 
-app.use('/api/subjects',subjectsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/classes',classesRouter);
-app.use('/api/departments',departmentsRouter);
+app.use("/api/subjects", subjectsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/classes", classesRouter);
+app.use("/api/departments", departmentsRouter);
+app.use("/api/stats", statsRouter);
+app.use("/api/enrollments", enrollmentsRouter);
 
 // root route
 app.get("/", (req, res) => {
